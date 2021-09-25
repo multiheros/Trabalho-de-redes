@@ -1,6 +1,5 @@
 import socket
 import time
-import statistics
 
 
 def chatCliente(socket_udp, dest):
@@ -12,15 +11,18 @@ def chatCliente(socket_udp, dest):
 
     info = []
 
+    print("Envindo as mensagens...")
+
     for linha in entrada:
         # delay de 1 segundo
+        time.sleep(1)
         # gravando o tempo no envio da mensagem.
         tempoAntes = time.time()
         # enviando
         socket_udp.sendto(str.encode(linha), dest)
 
-        # timeout para 256ms
         try:
+            # timeout para 256ms
             socket_udp.settimeout(0.256)
             # lendo resposta
             resposta = socket_udp.recv(1024)
@@ -37,7 +39,9 @@ def chatCliente(socket_udp, dest):
 
     with open("saida.txt", "w") as saida:
         saida.write("\n".join(str(item) for item in info))
-        saida.write("\n\n\nRTT=> " + str(rttMedia(info)))
+        saida.write("\n\n\nRTT=> " + str(rttMedia(info)) + "\n")
+
+    print("Mensagens enviadas com sucesso!")
 
 
 def rttMedia(info):
