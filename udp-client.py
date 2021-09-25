@@ -3,12 +3,15 @@ import time
 
 
 def chatCliente(socket_udp, dest):
+    # tratamento para caso de algum problema ao abrir o arquivo
     try:
+        # abre o arquivo de texto com as mensagens para enviar
         entrada = open("entrada.txt", "r")
     except:
         print("Problema ao abrir arquivo")
         return
 
+    # lista com as informações dos envios das mensagens
     info = []
 
     print("Envindo as mensagens...")
@@ -28,22 +31,26 @@ def chatCliente(socket_udp, dest):
             resposta = socket_udp.recv(1024)
             # gravando o tempo na recepção da mensagem
             tempoDepois = time.time()
-            # Round Trip Time
+            # round trip time
             rtt = tempoDepois - tempoAntes
-
+            # salva a resposta e o rtt
             info.append([resposta, rtt])
         except:
+            # salva a mensagem que não foi enviada e a mensagem de timeout
             info.append([linha, "timeout"])
 
+    # fecha o arquivo de texto
     entrada.close()
 
+    # salva a lista com as informações de envio e o RTT médio das mensagens
     with open("saida.txt", "w") as saida:
         saida.write("\n".join(str(item) for item in info))
         saida.write("\n\n\nRTT=> " + str(rttMedia(info)) + "\n")
 
-    print("Mensagens enviadas com sucesso!")
+    print("Mensagens enviadas com sucesso!\n")
 
 
+# função para calcular o RTT médio das mensagens
 def rttMedia(info):
     media = 0
     tamanho = 0
@@ -55,6 +62,7 @@ def rttMedia(info):
     return media/tamanho
 
 
+# FUNÇÃO PRINCIPAL
 def main():
     HOST = '192.168.1.30'  # Endereco IP do Servidor
     PORT = 5002            # Porta que o Servidor esta
