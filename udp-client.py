@@ -45,21 +45,25 @@ def chatCliente(socket_udp, dest):
     # salva a lista com as informações de envio e o RTT médio das mensagens
     with open("saida.txt", "w") as saida:
         saida.write("\n".join(str(item) for item in info))
-        saida.write("\n\n\nRTT=> " + str(rttMedia(info)) + "\n")
+        saida.write(rttMedia(info))
 
     print("Mensagens enviadas com sucesso!\n")
 
 
-# função para calcular o RTT médio das mensagens
+# função para calcular o RTT médio das mensagens e perca de pacotes
 def rttMedia(info):
     media = 0
-    tamanho = 0
+    sucesso = 0
     for item in info:
         if(item[1] != "timeout"):
             media += item[1]
-            tamanho = tamanho + 1
+            sucesso = sucesso + 1
 
-    return media/tamanho
+    enviadas = len(info)
+    timeout = enviadas - sucesso
+    taxaPerca = (timeout*100)/enviadas
+
+    return "\n\n\nRTT médio => " + str(media/sucesso) + "\nPerda de pacotes => " + str(taxaPerca) + "%\n"
 
 
 # FUNÇÃO PRINCIPAL
